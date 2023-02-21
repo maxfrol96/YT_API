@@ -32,9 +32,11 @@ class Channel():
         channel_dict = self.__dict__
         print(type(channel_dict))
         with open(f'{file_name}', 'w', encoding='windows-1251') as file:
-            for key in channel_dict:
-                file.write(f'{key}: ')
-                file.write(f'{channel_dict[key]}\n')
+            channel = json.dumps(channel_dict, indent=2, ensure_ascii=False)
+            file.write(channel)
 
+id = 'UCMCgOm8GZkHp8zJ6l7_hIuA'
+vdud = Channel(id)
+vdud.to_json('vdud.json')
 
 
