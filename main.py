@@ -25,7 +25,7 @@ class Channel():
 
 
     def print_info(self):
-        channel = Channel.get_service().channels().list(id=self.__id, part='snippet,statistics').execute()
+        channel = Channel.get_service().channels().list(id=self.__id, part='snippet').execute()
         return channel
 
     def to_json(self, file_name):
@@ -80,16 +80,32 @@ class PLVideo(Video):
         super().__init__(id)
         self.pl_id = pl_id
 
+    @property
+    def pl_title(self):
+        playlist = PLVideo.get_service().playlists().list(id=self.pl_id, part='snippet').execute()
+        return playlist['items'][0]['snippet']['title']
+
+    def __str__(self):
+        return f'{self.title} ({self.pl_title})'
 
 
-#
-# video = Video('1MgGw-LQPjg')
+
+
+
+
+# video = Video('BBotskuyw_M')
 # print(video)
 # print(video.likes)
 # print(video.views)
 
-id = 'PLPLtdcj9QWBvxCRDYSbsTaeeO9XismIVM'
-api_key: str = os.getenv('YT_KEY')
-youtube = build('youtube', 'v3', developerKey=api_key)
-video_info = youtube.playlists().list(id=id, part="contentDetails").execute()
-print(video_info)
+# id = 'PLPLtdcj9QWBvFSWQmCLwrjA3uL39zmiE6'
+# api_key: str = os.getenv('YT_KEY')
+# youtube = build('youtube', 'v3', developerKey=api_key)
+# video_info = youtube.playlistItems().list(playlistId=id, part="contentDetails", maxResults = 50).execute()
+# print(video_info)
+# playlist_id = 'PL7Ntiz7eTKwrqmApjln9u4ItzhDLRtPuD'
+# playlist = youtube.playlists().list(id=playlist_id, part='snippet').execute()
+# playlist_name = playlist['items'][0]['snippet']['title']
+# print(playlist)
+
+print(PLVideo('BBotskuyw_M', 'PL7Ntiz7eTKwrqmApjln9u4ItzhDLRtPuD'))
