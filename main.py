@@ -1,8 +1,19 @@
 import os
 import json
+from datetime import datetime, time, timedelta
 from googleapiclient.discovery import build
 
-class Channel():
+
+class MixinYT():
+
+    @classmethod
+    def get_service(cls):
+        api_key: str = os.getenv('YT_KEY')
+        youtube = build('youtube', 'v3', developerKey=api_key)
+        return youtube
+
+
+class Channel(MixinYT):
 
     def __init__(self, id):
         self.__id = id
@@ -16,12 +27,6 @@ class Channel():
     @property
     def id(self):
         return self.__id
-
-    @classmethod
-    def get_service(cls):
-        api_key: str = os.getenv('YT_KEY')
-        youtube = build('youtube', 'v3', developerKey=api_key)
-        return youtube
 
 
     def print_info(self):
@@ -45,7 +50,7 @@ class Channel():
         return self.subscriber_count > other.subscriber_count
 
 
-class Video():
+class Video(MixinYT):
 
     def __init__(self, id):
         self.id = id
@@ -66,11 +71,6 @@ class Video():
         return video_info['items'][0]['statistics']['viewCount']
 
 
-    @classmethod
-    def get_service(cls):
-        api_key: str = os.getenv('YT_KEY')
-        youtube = build('youtube', 'v3', developerKey=api_key)
-        return youtube
 
     def __str__(self):
         return f'{self.title}'
@@ -89,23 +89,78 @@ class PLVideo(Video):
         return f'{self.title} ({self.pl_title})'
 
 
+class Playlist(MixinYT):
+    def __init__(self, id):
+        self.id = id
+
+    @property
+    def title(self):
+        playlist = Playlist.get_service().playlists().list(id=self.id, part='snippet').execute()
+        return playlist['items'][0]['snippet']['title']
+
+    @property
+    def url(self):
+        return f'https://www.youtube.com/playlist?list={self.id}'
+
+    def video_list(self):
+        playlist = Playlist.get_service().playlistItems().list(playlistId=self.id, part="contentDetails", maxResults=50).execute()
+        video_list = []
+        for item in playlist['items']:
+            video_list.append(item['contentDetails']['videoId'])
+        return video_list
+
+    def total_duration(self):
+        video_list = self.video_list()
+        total_duration = time(0,0,0)
+        for item in video_list:
+            video = Playlist.get_service().videos().list(id=item, part="contentDetails").execute()
+            duration = video['items'][0]['contentDetails']['duration']
+            duration = datetime.strptime(duration, 'PT%HH%MM%SS').time()
+            total_duration += duration
+        return total_duration
+
+
+    def show_best_video(self):
+        video_list = self.video_list()
+        best_video = ''
+        likes = 0
+        for item in video_list:
+            video = Video(item)
+            if int(video.likes) > likes:
+                likes = int(video.likes)
+                best_video = item
+        return f'https://youtu.be/{best_video}'
 
 
 
 
-# video = Video('BBotskuyw_M')
-# print(video)
-# print(video.likes)
-# print(video.views)
 
-# id = 'PLPLtdcj9QWBvFSWQmCLwrjA3uL39zmiE6'
+pl=Playlist('PL7Ntiz7eTKwrqmApjln9u4ItzhDLRtPuD')
+print(pl.url)
+print(pl.video_list())
+print(pl.show_best_video())
+print(pl.total_duration())
+
+
+
+# id = '1ot9xIG9lKc'
 # api_key: str = os.getenv('YT_KEY')
 # youtube = build('youtube', 'v3', developerKey=api_key)
+# video_info = youtube.videos().list(id=id, part="contentDetails").execute()
+# print(video_info)
+# #
+# pl_info = youtube.playlistItems().list(playlistId=id, part="contentDetails", maxResults = 50).execute()
+# print(pl_info)
+
+
 # video_info = youtube.playlistItems().list(playlistId=id, part="contentDetails", maxResults = 50).execute()
 # print(video_info)
-# playlist_id = 'PL7Ntiz7eTKwrqmApjln9u4ItzhDLRtPuD'
-# playlist = youtube.playlists().list(id=playlist_id, part='snippet').execute()
-# playlist_name = playlist['items'][0]['snippet']['title']
-# print(playlist)
+# d = 'PT1H48M25S'
+# d = datetime.strptime(d, 'PT%HH%MM%SS').time()
+# print(d)
 
-print(PLVideo('BBotskuyw_M', 'PL7Ntiz7eTKwrqmApjln9u4ItzhDLRtPuD'))
+# time_string = "1530:46"
+# time_object = datetime.strptime(time_string, "%H:%M:%S").time()
+# print(time_object)
+# timeobj = time(8,48,45)
+# print(timeobj)
