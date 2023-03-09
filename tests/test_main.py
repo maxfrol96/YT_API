@@ -1,4 +1,4 @@
-from main import Video, PLVideo
+from main import Video, PLVideo, Playlist
 
 def test_Video():
     video = Video('BBotskuyw_M')
@@ -8,3 +8,8 @@ def test_PLvideo():
     pl_video = PLVideo('BBotskuyw_M', 'PL7Ntiz7eTKwrqmApjln9u4ItzhDLRtPuD')
     assert pl_video.title == 'Пушкин: наше все?'
     assert  pl_video.pl_title == 'Литература'
+
+def test_Playlist():
+    pl = Playlist('PL7Ntiz7eTKwrqmApjln9u4ItzhDLRtPuD')
+    assert pl.url == 'https://www.youtube.com/playlist?list=PL7Ntiz7eTKwrqmApjln9u4ItzhDLRtPuD'
+    assert pl.show_best_video() == 'https://youtu.be/1ot9xIG9lKc'

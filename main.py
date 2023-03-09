@@ -1,6 +1,6 @@
 import os
 import json
-from datetime import datetime, time, timedelta
+from datetime import datetime, timedelta
 from googleapiclient.discovery import build
 
 
@@ -111,12 +111,12 @@ class Playlist(MixinYT):
 
     def total_duration(self):
         video_list = self.video_list()
-        total_duration = time(0,0,0)
+        total_duration = timedelta(seconds=0)
         for item in video_list:
             video = Playlist.get_service().videos().list(id=item, part="contentDetails").execute()
             duration = video['items'][0]['contentDetails']['duration']
-            duration = datetime.strptime(duration, 'PT%HH%MM%SS').time()
-            total_duration += duration
+            duration_time = datetime.strptime(duration, 'PT%HH%MM%SS') - datetime.strptime("00:00:00","%H:%M:%S")
+            total_duration += duration_time
         return total_duration
 
 
