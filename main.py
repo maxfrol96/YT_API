@@ -57,18 +57,27 @@ class Video(MixinYT):
 
     @property
     def title(self):
-        video_info = Video.get_service().videos().list(id=self.id, part="snippet").execute()
-        return video_info['items'][0]['snippet']['title']
+        try:
+            video_info = Video.get_service().videos().list(id=self.id, part="snippet").execute()
+            return video_info['items'][0]['snippet']['title']
+        except:
+            return None
 
     @property
     def likes(self):
-        video_info = Video.get_service().videos().list(id=self.id, part="statistics").execute()
-        return video_info['items'][0]['statistics']['likeCount']
+        try:
+            video_info = Video.get_service().videos().list(id=self.id, part="statistics").execute()
+            return video_info['items'][0]['statistics']['likeCount']
+        except:
+            return None
 
     @property
     def views(self):
-        video_info = Video.get_service().videos().list(id=self.id, part="statistics").execute()
-        return video_info['items'][0]['statistics']['viewCount']
+        try:
+            video_info = Video.get_service().videos().list(id=self.id, part="statistics").execute()
+            return video_info['items'][0]['statistics']['viewCount']
+        except:
+            return None
 
 
 
@@ -135,14 +144,16 @@ class Playlist(MixinYT):
 
 
 
-pl=Playlist('PL7Ntiz7eTKwrqmApjln9u4ItzhDLRtPuD')
-print(pl.url)
-print(pl.video_list())
-print(pl.show_best_video())
-print(pl.total_duration())
+# pl=Playlist('PL7Ntiz7eTKwrqmApjln9u4ItzhDLRtPuD')
+# print(pl.url)
+# print(pl.video_list())
+# print(pl.show_best_video())
+# print(pl.total_duration())
 
-
-
+video = Video('D5SKbtnK5f4')
+print(video.likes)
+print(video.title)
+print(video.id)
 # id = '1ot9xIG9lKc'
 # api_key: str = os.getenv('YT_KEY')
 # youtube = build('youtube', 'v3', developerKey=api_key)
