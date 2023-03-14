@@ -54,30 +54,40 @@ class Video(MixinYT):
 
     def __init__(self, id):
         self.id = id
-
-    @property
-    def title(self):
+        video_info_snippet = Video.get_service().videos().list(id=self.id, part="snippet").execute()
+        video_info_stat = Video.get_service().videos().list(id=self.id, part="statistics").execute()
         try:
-            video_info = Video.get_service().videos().list(id=self.id, part="snippet").execute()
-            return video_info['items'][0]['snippet']['title']
+            self.title = video_info_snippet['items'][0]['snippet']['title']
+            self.likes = video_info_stat['items'][0]['statistics']['likeCount']
+            self.views = video_info_stat['items'][0]['statistics']['viewCount']
         except:
-            return None
+            self.title = None
+            self.likes = None
+            self.views = None
 
-    @property
-    def likes(self):
-        try:
-            video_info = Video.get_service().videos().list(id=self.id, part="statistics").execute()
-            return video_info['items'][0]['statistics']['likeCount']
-        except:
-            return None
-
-    @property
-    def views(self):
-        try:
-            video_info = Video.get_service().videos().list(id=self.id, part="statistics").execute()
-            return video_info['items'][0]['statistics']['viewCount']
-        except:
-            return None
+    # @property
+    # def title(self):
+    #     try:
+    #         video_info = Video.get_service().videos().list(id=self.id, part="snippet").execute()
+    #         return video_info['items'][0]['snippet']['title']
+    #     except:
+    #         return None
+    #
+    # @property
+    # def likes(self):
+    #     try:
+    #         video_info = Video.get_service().videos().list(id=self.id, part="statistics").execute()
+    #         return video_info['items'][0]['statistics']['likeCount']
+    #     except:
+    #         return None
+    #
+    # @property
+    # def views(self):
+    #     try:
+    #         video_info = Video.get_service().videos().list(id=self.id, part="statistics").execute()
+    #         return video_info['items'][0]['statistics']['viewCount']
+    #     except:
+    #         return None
 
 
 
@@ -150,7 +160,7 @@ class Playlist(MixinYT):
 # print(pl.show_best_video())
 # print(pl.total_duration())
 
-video = Video('D5SKbtnK5f4')
+video = Video('D5SKbtnK5f')
 print(video.likes)
 print(video.title)
 print(video.id)
